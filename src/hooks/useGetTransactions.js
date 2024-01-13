@@ -28,13 +28,16 @@ export const useGetTransactions = () => {
         let docs = [];
 
         snapshot.forEach((document) => {
-          const data = document.data;
+          console.log("document: ", document);
+          const data = document.data();
+          console.log("data:", data);
           const id = document.id;
 
           docs.push({ ...data, id });
         });
 
         setTransactions(docs);
+        console.log("transactions: ", docs);
       });
     } catch (err) {
       console.log(err);

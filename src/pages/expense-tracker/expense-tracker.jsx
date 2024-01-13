@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useAddTransaction } from "../../hooks/useAddTransaction";
+import { useGetTransactions } from "../../hooks/useGetTransactions";
+import { signOut } from "firebase/auth";
+import { auth } from "../../config/firebase-config";
 
 export const ExpenseTracker = () => {
   const { addTransaction } = useAddTransaction();
@@ -7,6 +10,7 @@ export const ExpenseTracker = () => {
   const [description, setDescription] = useState("");
   const [transactionAmount, setTransactionAmount] = useState(0);
   const [transactionType, setTransactionType] = useState("expense");
+  const { transactions } = useGetTransactions();
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -17,8 +21,18 @@ export const ExpenseTracker = () => {
     });
   };
 
+  const signUserOut = async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
+      <button onClick={signUserOut}>Sign Out</button>
       <div>
         <div className="container">
           <h1>Expense Tracker</h1>
@@ -74,7 +88,23 @@ export const ExpenseTracker = () => {
           </form>
         </div>
       </div>
-      <div className="transactions"></div>
+      <div className="transactions">
+        <h3>Transactions</h3>
+        <ul>
+          {transactions.map((transaction) => {
+            const { description, transactionAmount, transactionType } =
+              transaction;
+            return (
+              <li>
+                <h4>{description}</h4>
+                <p>
+                  ${transactionAmount} - {transactionType}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </>
   );
 };
