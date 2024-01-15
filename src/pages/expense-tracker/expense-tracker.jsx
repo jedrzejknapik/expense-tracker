@@ -3,6 +3,8 @@ import { useAddTransaction } from "../../hooks/useAddTransaction";
 import { useGetTransactions } from "../../hooks/useGetTransactions";
 import { signOut } from "firebase/auth";
 import { auth } from "../../config/firebase-config";
+import { useGetUserInfo } from "../../hooks/useGetUserInfo";
+import { useNavigate } from "react-router-dom";
 
 export const ExpenseTracker = () => {
   const { addTransaction } = useAddTransaction();
@@ -11,6 +13,8 @@ export const ExpenseTracker = () => {
   const [transactionAmount, setTransactionAmount] = useState(0);
   const [transactionType, setTransactionType] = useState("expense");
   const { transactions } = useGetTransactions();
+  const { name, photoUrl } = useGetUserInfo();
+  const navigate = useNavigate();
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -25,17 +29,25 @@ export const ExpenseTracker = () => {
     try {
       await signOut(auth);
       localStorage.clear();
+      navigate("/");
     } catch (err) {
       console.log(err);
     }
   };
 
+  console.log("profile: ", photoUrl);
+
   return (
     <>
+      {photoUrl && (
+        <div>
+          <img src={photoUrl} alt="profile" />
+        </div>
+      )}
       <button onClick={signUserOut}>Sign Out</button>
       <div>
         <div className="container">
-          <h1>Expense Tracker</h1>
+          <h1>{name}'s Expense Tracker</h1>
           <div className="balance">
             <h3>Your Balance</h3>
             <h2>$ 0.00</h2>
